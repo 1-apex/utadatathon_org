@@ -16,12 +16,21 @@ interface ScannedData {
 
 export default function ScannerPage() {
   const [user] = useAuthState(auth);
+  const [userId, setUserId] = useState<string | null>(null);
   const [scannedData, setScannedData] = useState<ScannedData | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [registrationLoading, setRegistrationLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+
+  const events = [
+    { id: "event-1", name: "Opening Ceremony" },
+    { id: "event-2", name: "Workshop Session" },
+    { id: "event-3", name: "Hacking Time" },
+    { id: "event-4", name: "Judging Round" },
+    { id: "event-5", name: "Closing Ceremony" }
+  ];
 
   const lastScannedIdRef = useRef<string | null>(null);
 
@@ -31,29 +40,30 @@ export default function ScannerPage() {
       return;
     }
 
-    console.log("id : ", id);
-  
+    console.log("Scanned ID:", id);
+
     if (!user) {
-      setError("Authentication required");
+      setError("Authentication required.");
       return;
     }
-  
+
     if (loading || id === lastScannedIdRef.current) return;
-  
+
     setLoading(true);
     setError("");
     setSuccessMessage("");
-  
+
     try {
       const docRef = doc(db, "registrations", id.trim());
-      console.log("docRef:", docRef);
+      console.log("Document Reference:", docRef);
       const docSnap = await getDoc(docRef);
-  
+
       if (!docSnap.exists()) {
-        throw new Error("Participant not found");
+        throw new Error("Participant not found.");
       }
-  
+
       const data = docSnap.data() as ScannedData;
+      setUserId(id);
       setScannedData(data);
       lastScannedIdRef.current = id;
       setShowModal(true);
@@ -65,40 +75,43 @@ export default function ScannerPage() {
   };
 
   const handleEventRegistration = async (eventKey: string) => {
-    if (!scannedData?.userId || !user) {
-      console.warn("Missing scanned data or user not authenticated.");
+    if (!userId || !user) {
+      console.warn("Missing document ID or user not authenticated.");
       return;
     }
-
+  
+    const validEventKeys = ["event-1", "event-2", "event-3", "event-4", "event-5"];
+    if (!validEventKeys.includes(eventKey)) {
+      setError("Invalid event key.");
+      return;
+    }
+  
     setRegistrationLoading(true);
     setError("");
     setSuccessMessage("");
-
+  
     try {
-      const userRef = doc(db, "registrations", scannedData.userId);
-      const docSnap = await getDoc(userRef);
-
-      if (!docSnap.exists()) {
-        throw new Error(`No registration record found for user ID: ${scannedData.userId}`);
-      }
-
+      const userRef = doc(db, "registrations", userId);
+      console.log("Updating document with ID:", userId);
+  
       await updateDoc(userRef, {
         [`events.${eventKey}`]: true,
-        [`events.${eventKey}_timestamp`]: new Date().toISOString(),
       });
-
-      setSuccessMessage(`User ${scannedData.firstname} successfully registered for event: ${eventKey}`);
+  
+      const eventName = events.find((e) => e.id === eventKey)?.name || "Unknown Event";
+      setSuccessMessage(`User ${scannedData?.firstname} successfully registered for event: ${eventName}`);
       setShowModal(false);
       setScannedData(null);
+      setUserId(null);
       lastScannedIdRef.current = null;
     } catch (err) {
-      const errorMessage = (err instanceof Error) ? err.message : String(err);
-      console.error("Error updating registration:", errorMessage);
-      setError("Failed to update participant record: " + errorMessage);
+      console.error("Error updating registration:", err);
+      setError("Failed to update participant record: " + (err as Error).message);
     } finally {
       setRegistrationLoading(false);
     }
   };
+  
 
   return (
     <div className="p-4">
