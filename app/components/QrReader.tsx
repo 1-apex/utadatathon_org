@@ -82,7 +82,7 @@ export default function QrReader({ onScan }: { onScan: (data: string) => void })
           setError("QR code scanner is not initialized.");
           return;
         }
-        const result = await html5QrRef.current.scanFile(file, true); // tryHarder = true
+        const result = await html5QrRef.current.scanFile(file, true); 
         onScan(result);
       } catch (err) {
         console.error("QR scan error:", err);
@@ -101,7 +101,7 @@ export default function QrReader({ onScan }: { onScan: (data: string) => void })
     const file = e.target.files[0];
 
     try {
-      const result = await html5QrRef.current.scanFile(file, true); // tryHarder = true
+      const result = await html5QrRef.current.scanFile(file, true); 
       onScan(result);
     } catch (err) {
       console.error("QR scan error:", err);

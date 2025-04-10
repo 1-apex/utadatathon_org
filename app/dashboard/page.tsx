@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import QrReader from "@/app/components/QrReader";
 import Modal from "@/app/components/Modal";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
@@ -16,29 +16,46 @@ interface ScannedData {
 
 export default function ScannerPage() {
   const [user] = useAuthState(auth);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [scannedData, setScannedData] = useState<ScannedData | null>();
+  const [scannedData, setScannedData] = useState<ScannedData | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [registrationLoading, setRegistrationLoading] = useState(false);
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const lastScannedIdRef = useRef<string | null>(null);
 
   const handleScan = async (id: string) => {
+    if (!id) {
+      setError("Invalid QR code. Please try again.");
+      return;
+    }
+
+    console.log("id : ", id);
+  
     if (!user) {
       setError("Authentication required");
       return;
     }
-    
+  
+    if (loading || id === lastScannedIdRef.current) return;
+  
     setLoading(true);
+    setError("");
+    setSuccessMessage("");
+  
     try {
-      const docRef = doc(db, "registrations", id);  // Use the documentId from QR code here
-      setUserId(id);
+      const docRef = doc(db, "registrations", id.trim());
+      console.log("docRef:", docRef);
       const docSnap = await getDoc(docRef);
-      
+  
       if (!docSnap.exists()) {
         throw new Error("Participant not found");
       }
-      
-      setScannedData(docSnap.data() as ScannedData);
+  
+      const data = docSnap.data() as ScannedData;
+      setScannedData(data);
+      lastScannedIdRef.current = id;
       setShowModal(true);
     } catch (err) {
       setError("Error scanning QR code: " + (err as Error).message);
@@ -47,49 +64,55 @@ export default function ScannerPage() {
     }
   };
 
-
   const handleEventRegistration = async (eventKey: string) => {
-    if (!scannedData?.userId || !user) return;
-  
+    if (!scannedData?.userId || !user) {
+      console.warn("Missing scanned data or user not authenticated.");
+      return;
+    }
 
+    setRegistrationLoading(true);
+    setError("");
+    setSuccessMessage("");
 
     try {
-      if (!userId) {
-        throw new Error("User ID is null");
-      }
-      const userRef = doc(db, "registrations", userId);
+      const userRef = doc(db, "registrations", scannedData.userId);
       const docSnap = await getDoc(userRef);
-  
+
       if (!docSnap.exists()) {
-        throw new Error("No document found for this user.");
+        throw new Error(`No registration record found for user ID: ${scannedData.userId}`);
       }
-  
-      console.log("Document data:", docSnap.data()); // Log the document data for debugging
-  
+
       await updateDoc(userRef, {
         [`events.${eventKey}`]: true,
-        [`events.${eventKey}_timestamp`]: new Date(),
+        [`events.${eventKey}_timestamp`]: new Date().toISOString(),
       });
-  
+
+      setSuccessMessage(`User ${scannedData.firstname} successfully registered for event: ${eventKey}`);
       setShowModal(false);
-  
+      setScannedData(null);
+      lastScannedIdRef.current = null;
     } catch (err) {
-      setError("Failed to update participant record: " + (err as Error).message);
+      const errorMessage = (err instanceof Error) ? err.message : String(err);
+      console.error("Error updating registration:", errorMessage);
+      setError("Failed to update participant record: " + errorMessage);
+    } finally {
+      setRegistrationLoading(false);
     }
   };
-  
-  
 
   return (
-    <div>
+    <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">QR Code Scanner</h1>
+
       {error && <div className="bg-red-100 p-4 rounded mb-4 text-red-700">{error}</div>}
-      {loading && <div className="p-4 bg-blue-100 rounded">Processing scan...</div>}
-      
+      {successMessage && <div className="bg-green-100 p-4 rounded mb-4 text-green-700">{successMessage}</div>}
+      {loading && <div className="p-4 bg-blue-100 rounded mb-4">Processing scan...</div>}
+      {registrationLoading && <div className="p-4 bg-blue-100 rounded mb-4">Registering user...</div>}
+
       <div className="border rounded-lg p-4 bg-white shadow-sm">
         <QrReader onScan={handleScan} />
       </div>
-      
+
       <Modal
         open={showModal}
         onClose={() => setShowModal(false)}
