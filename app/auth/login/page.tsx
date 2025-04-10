@@ -6,6 +6,7 @@ import React, { useState } from "react";
 
 const adminEmails = [
   "pratham153patil@gmail.com",
+  "thesamarthjagtap@gmail.com"
 ];
 
 export default function LoginPage() {
