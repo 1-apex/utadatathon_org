@@ -121,6 +121,7 @@ export default function QrReader({ onScan }: { onScan: (data: string) => void })
         <video
           ref={videoRef}
           className="w-full h-full object-cover"
+          autoPlay 
           muted
           playsInline
         />
