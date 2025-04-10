@@ -23,7 +23,9 @@ export default function QrReader({ onScan }: { onScan: (data: string) => void })
         }
 
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { deviceId: videoDevices[0].deviceId },
+          video: videoDevices[0]?.deviceId 
+            ? { deviceId: videoDevices[0].deviceId } 
+            : { facingMode: { exact: "environment" } },
         });
 
         if (videoRef.current) {
