@@ -12,7 +12,7 @@ export default function Modal({
   open,
   onClose,
   userData,
-  onRegister
+  onRegister,
 }: {
   open: boolean;
   onClose: () => void;
@@ -20,12 +20,84 @@ export default function Modal({
   onRegister: (eventKey: string) => void;
 }) {
   const [selectedEvent, setSelectedEvent] = useState("event-1");
+
   const events = [
-    { id: "event-1", name: "Opening Ceremony" },
-    { id: "event-2", name: "Workshop Session" },
-    { id: "event-3", name: "Hacking Time" },
-    { id: "event-4", name: "Judging Round" },
-    { id: "event-5", name: "Closing Ceremony" }
+    {
+      id: "event-1",
+      name: "Registration & Check-in",
+    },
+    {
+      id: "event-2",
+      name: "Opening Ceremony",
+    },
+    {
+      id: "event-3",
+      name: "Hacking Begins",
+    },
+    {
+      id: "event-4",
+      name: "Lunch",
+    },
+    {
+      id: "event-5",
+      name: "Workshop #1",
+    },
+    {
+      id: "event-6",
+      name: "Workshop #2 (MLH)",
+    },
+    {
+      id: "event-7",
+      name: "Dr. Behzad Workshop - Data Diversity in ML",
+    },
+    {
+      id: "event-8",
+      name: "Snacks",
+    },
+    {
+      id: "event-9",
+      name: "Workshop #4",
+    },
+    {
+      id: "event-10",
+      name: "Mini-Event: Hungry Hungry Hippos",
+    },
+    {
+      id: "event-11",
+      name: "Dinner",
+    },
+    {
+      id: "event-12",
+      name: "Mini-Event: Scribbl.io",
+    },
+    {
+      id: "event-13",
+      name: "Late Night Coffee",
+    },
+    {
+      id: "event-14",
+      name: "Mini-Event: Late Night Among Us",
+    },
+    {
+      id: "event-15",
+      name: "Breakfast",
+    },
+    {
+      id: "event-16",
+      name: "Hacking Ends & Judging Begins",
+    },
+    {
+      id: "event-17",
+      name: "Lunch",
+    },
+    {
+      id: "event-18",
+      name: "Mini-Event: Bingo",
+    },
+    {
+      id: "event-19",
+      name: "Closing Ceremony",
+    },
   ];
 
   if (!open) return null;
@@ -35,11 +107,17 @@ export default function Modal({
       <div className="bg-white p-6 rounded-lg w-96">
         <h2 className="text-xl font-bold mb-4">Participant Details</h2>
         <div className="space-y-2">
-          <p><strong>Name:</strong> {userData?.firstname} {userData?.lastname}</p>
-          <p><strong>Email:</strong> {userData?.email}</p>
-          <p><strong>School:</strong> {userData?.schoolName}</p>
+          <p>
+            <strong>Name:</strong> {userData?.firstname} {userData?.lastname}
+          </p>
+          <p>
+            <strong>Email:</strong> {userData?.email}
+          </p>
+          <p>
+            <strong>School:</strong> {userData?.schoolName}
+          </p>
         </div>
-        
+
         <div className="mt-4">
           <label className="block mb-2">Select Event</label>
           <select
@@ -47,14 +125,14 @@ export default function Modal({
             value={selectedEvent}
             onChange={(e) => setSelectedEvent(e.target.value)}
           >
-            {events.map(event => (
+            {events.map((event) => (
               <option key={event.id} value={event.id}>
                 {event.name}
               </option>
             ))}
           </select>
         </div>
-        
+
         <div className="mt-4 flex justify-end gap-2">
           <button
             onClick={onClose}
