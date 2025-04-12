@@ -12,53 +12,9 @@ export default function QrReader({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[]>([]);
-  const [facingMode, setFacingMode] = useState<"environment" | "user">(
-    "environment"
-  );
   const html5QrRef = useRef<Html5Qrcode | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
 
-  const toggleCamera = async () => {
-    if (!html5QrRef.current || !mediaStreamRef.current) return;
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // Stop current stream and scanner
-      mediaStreamRef.current.getTracks().forEach((track) => track.stop());
-      await html5QrRef.current.stop();
-
-      // Switch facing mode
-      const newFacingMode =
-        facingMode === "environment" ? "user" : "environment";
-      const constraints = { video: { facingMode: { exact: newFacingMode } } };
-
-      // Get new media stream
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      mediaStreamRef.current = stream;
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-      }
-
-      // Update state and restart scanner
-      setFacingMode(newFacingMode);
-      await html5QrRef.current.start(
-        { facingMode: newFacingMode },
-        { fps: 10, qrbox: 250 },
-        onScan,
-        (error) => console.error("QR scan error:", error)
-      );
-    } catch (err) {
-      console.error("Camera switch failed:", err);
-      setError("Camera switch unavailable. Using current camera.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   useEffect(() => {
     const initCamera = async () => {
@@ -66,7 +22,6 @@ export default function QrReader({
       try {
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoInputs = devices.filter((d) => d.kind === "videoinput");
-        setVideoDevices(videoInputs);
 
         if (videoInputs.length === 0) {
           throw new Error("No video devices found.");
@@ -177,18 +132,6 @@ export default function QrReader({
             Loading camera...
           </div>
         )}
-
-        {/* {videoDevices.length > 1 && (
-          <button
-            onClick={toggleCamera}
-            className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10
-              bg-black/70 hover:bg-black/80 text-white px-4 py-2 
-              rounded-full text-sm transition-all"
-            disabled={isLoading}
-          >
-            {isLoading ? "Switching..." : "↻ Flip Camera"}
-          </button>
-        )} */}
 
         <video
           ref={videoRef}
