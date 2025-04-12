@@ -22,7 +22,8 @@ const adminEmails = [
   "aastha6100@gmail.com",
   "pranachilukuri22@gmail.com",
   "kanishkaabharti@gmail.com",
-  "ramialet02@gmail.com"
+  "ramialet02@gmail.com",
+  "devratasauthor@gmail.com"
 ];
 
 export default function DashboardLayout({
