@@ -34,13 +34,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-96">
-        <h1 className="text-2xl font-bold mb-6">Organizer Login</h1>
+    <div className="min-h-screen flex items-center justify-center bg-[#0d1117]">
+      <div className="bg-[#161b22] p-8 rounded-lg shadow-md w-96">
+        <h1 className="text-2xl font-bold mb-6 text-center">Organizer Login</h1>
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <button
           onClick={handleGoogleLogin}
-          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+          className="w-full bg-blue-500 text-white font-semibold p-2 rounded hover:bg-blue-600"
         >
           Sign in with Google
         </button>

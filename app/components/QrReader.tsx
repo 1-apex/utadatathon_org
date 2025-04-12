@@ -171,16 +171,22 @@ export default function QrReader({
   };
 
   return (
-    <div className="flex flex-col gap-4 items-center justify-center p-4">
-      <div id="qr-reader-placeholder" className="hidden" />
-
-      <video
-        ref={videoRef}
-        className="rounded shadow-md max-w-full w-[360px] h-[270px] bg-black"
-        autoPlay
-        muted
-        playsInline
-      />
+    <div className="w-full max-w-md mx-auto p-4">
+      {/* Video Feed */}
+      <div className="relative aspect-square rounded-lg overflow-hidden bg-[black] shadow-md">
+        {isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center text-white text-lg font-semibold bg-black/70">
+            Loading camera...
+          </div>
+        )}
+        <video
+          ref={videoRef}
+          className="w-full h-full object-cover"
+          autoPlay
+          muted
+          playsInline
+        />
+      </div>
 
       <canvas ref={canvasRef} className="hidden" />
 
@@ -196,21 +202,23 @@ export default function QrReader({
             Switch Camera
           </button>
         )}
-        <button
-          onClick={captureAndScan}
-          className="px-4 py-2 bg-green-600 text-white rounded-md shadow hover:bg-green-700 transition"
-        >
-          Scan Frame
-        </button>
-        <label className="cursor-pointer bg-gray-600 text-white px-4 py-2 rounded-md shadow hover:bg-gray-700 transition">
-          Upload Image
-          <input
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleFileUpload}
-          />
-        </label>
+        <div className="flex gap-5 justify-center items-center w-full">
+          <button
+            onClick={captureAndScan}
+            className="px-4 py-2 bg-green-600 text-white rounded-md shadow hover:bg-green-700 transition"
+          >
+            Scan Frame
+          </button>
+          <label className="cursor-pointer bg-gray-600 text-white px-4 py-2 rounded-md shadow hover:bg-gray-700 transition">
+            Upload Image
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleFileUpload}
+            />
+          </label>
+        </div>
       </div>
     </div>
   );
