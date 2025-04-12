@@ -42,12 +42,8 @@ export default function Modal({
       name: "Workshop #2 (MLH)",
     },
     {
-      id: "event-17",
-      name: "Workshop #3"
-    },
-    {
       id: "event-7",
-      name: "Dr. Behzad Workshop - Data Diversity in ML",
+      name: "Workshop #3",
     },
     {
       id: "event-8",
