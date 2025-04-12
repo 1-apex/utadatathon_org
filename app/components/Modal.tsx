@@ -27,14 +27,6 @@ export default function Modal({
       name: "Registration & Check-in",
     },
     {
-      id: "event-2",
-      name: "Opening Ceremony",
-    },
-    {
-      id: "event-3",
-      name: "Hacking Begins",
-    },
-    {
       id: "event-4",
       name: "Lunch",
     },
@@ -55,48 +47,20 @@ export default function Modal({
       name: "Snacks",
     },
     {
-      id: "event-9",
-      name: "Workshop #4",
-    },
-    {
       id: "event-10",
-      name: "Mini-Event: Hungry Hungry Hippos",
-    },
-    {
-      id: "event-11",
       name: "Dinner",
     },
     {
       id: "event-12",
-      name: "Mini-Event: Scribbl.io",
-    },
-    {
-      id: "event-13",
       name: "Late Night Coffee",
     },
     {
       id: "event-14",
-      name: "Mini-Event: Late Night Among Us",
-    },
-    {
-      id: "event-15",
       name: "Breakfast",
     },
     {
       id: "event-16",
-      name: "Hacking Ends & Judging Begins",
-    },
-    {
-      id: "event-17",
       name: "Lunch",
-    },
-    {
-      id: "event-18",
-      name: "Mini-Event: Bingo",
-    },
-    {
-      id: "event-19",
-      name: "Closing Ceremony",
     },
   ];
 
