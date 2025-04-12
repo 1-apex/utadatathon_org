@@ -41,6 +41,10 @@ export default function ScannerPage() {
       name: "Lunch",
     },
     {
+      id: "event-17",
+      name: "Workshop #3"
+    },
+    {
       id: "event-5",
       name: "Workshop #1",
     },
