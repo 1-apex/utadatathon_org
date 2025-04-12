@@ -23,7 +23,10 @@ const adminEmails = [
   "pranachilukuri22@gmail.com",
   "kanishkaabharti@gmail.com",
   "ramialet02@gmail.com",
-  "devratasauthor@gmail.com"
+  "devratasauthor@gmail.com",
+  "isitthakkar1@gmail.com",
+  "karanthakkar2002@gmail.com"
+
 ];
 
 export default function LoginPage() {
