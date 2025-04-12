@@ -33,6 +33,10 @@ export default function ScannerPage() {
       name: "Registration & Check-in",
     },
     {
+      id: "event-2",
+      name: "T-shirts",
+    },
+    {
       id: "event-4",
       name: "Lunch",
     },
