@@ -15,7 +15,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-[#0a0f1f] border-b border-white/10 shadow-md">
+    <nav className="bg-[#0A1A33] border-b border-white/10 shadow-md">
        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
          {/* Logo / Title */}
          <h1 className="text-xl sm:text-2xl font-mono font-extrabold text-[--orange] tracking-wider drop-shadow-sm">
