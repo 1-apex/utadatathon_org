@@ -194,6 +194,7 @@ export default function QrReader({
       {isLoading && <p className="text-gray-500">Initializing camera...</p>}
 
       <div className="flex gap-2 mt-2">
+        <div className="flex gap-5 justify-center items-center w-full">
         {videoDevices.length > 1 && (
           <button
             onClick={toggleCamera}
@@ -202,14 +203,13 @@ export default function QrReader({
             Switch Camera
           </button>
         )}
-        <div className="flex gap-5 justify-center items-center w-full">
           <button
             onClick={captureAndScan}
-            className="px-4 py-2 bg-green-600 text-white rounded-md shadow hover:bg-green-700 transition"
+            className="px-4 py-2 bg-green-600 text-white rounded-md shadow hover:bg-green-700 transition text-center"
           >
             Scan Frame
           </button>
-          <label className="cursor-pointer bg-gray-600 text-white px-4 py-2 rounded-md shadow hover:bg-gray-700 transition">
+          <label className="cursor-pointer bg-gray-600 text-white px-4 py-2 rounded-md shadow hover:bg-gray-700 transition text-center">
             Upload Image
             <input
               type="file"
