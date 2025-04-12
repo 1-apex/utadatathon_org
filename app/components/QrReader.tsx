@@ -18,56 +18,45 @@ export default function QrReader({
   const mediaStreamRef = useRef<MediaStream | null>(null);
 
   const toggleCamera = async () => {
-    if (!html5QrRef.current) return;
-  
+    if (!html5QrRef.current || !mediaStreamRef.current || videoDevices.length < 2) return;
+
     setIsLoading(true);
     setError(null);
-  
+
     try {
+      mediaStreamRef.current.getTracks().forEach((track) => track.stop());
       await html5QrRef.current.stop();
-      mediaStreamRef.current?.getTracks().forEach((track) => track.stop());
-  
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  
-      if (isIOS) {
-        // iOS can't enumerate device IDs properly — use facingMode flip
-        const newFacingMode =
-          currentDeviceId === "environment" ? "user" : "environment";
-  
-        html5QrRef.current = new Html5Qrcode("qr-reader-placeholder");
-        await html5QrRef.current.start(
-          { facingMode: newFacingMode },
-          { fps: 10, qrbox: 250 },
-          onScan,
-          (err) => console.error("QR scan error", err)
-        );
-  
-        setCurrentDeviceId(newFacingMode);
-      } else {
-        // Android / Desktop – toggle by device ID
-        const currentIndex = videoDevices.findIndex(
-          (device) => device.deviceId === currentDeviceId
-        );
-        const nextIndex = (currentIndex + 1) % videoDevices.length;
-        const nextDeviceId = videoDevices[nextIndex].deviceId;
-  
-        html5QrRef.current = new Html5Qrcode("qr-reader-placeholder");
-        await html5QrRef.current.start(
-          { deviceId: { exact: nextDeviceId } },
-          { fps: 10, qrbox: 250 },
-          onScan,
-          (err) => console.error("QR scan error", err)
-        );
-  
-        setCurrentDeviceId(nextDeviceId);
+
+      const currentIndex = videoDevices.findIndex(
+        (device) => device.deviceId === currentDeviceId
+      );
+      const nextIndex = (currentIndex + 1) % videoDevices.length;
+      const nextDeviceId = videoDevices[nextIndex].deviceId;
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { deviceId: { exact: nextDeviceId } },
+      });
+
+      mediaStreamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
       }
+
+      setCurrentDeviceId(nextDeviceId);
+      await html5QrRef.current.start(
+        { deviceId: { exact: nextDeviceId } },
+        { fps: 10, qrbox: 250 },
+        onScan,
+        (error) => console.error("QR scan error:", error)
+      );
     } catch (err) {
-      console.error("Camera toggle failed", err);
-      setError("Unable to switch camera.");
+      console.error("Camera switch failed:", err);
+      setError("Camera switch unavailable.");
     } finally {
       setIsLoading(false);
     }
-  };  
+  };
 
   useEffect(() => {
     const initCamera = async () => {
