@@ -11,7 +11,7 @@ const adminEmails = [
   "satya.rallabandi7@gmail.com",
   "rr1shahzad@gmail.com",
   "zecilyjain2000@gmail.com",
-  "abhijitchallaplli99@gmail.com",
+  "abhijitchallapalli99@gmail.com",
   "clivin100@gmail.com",
   "desair2003@gmail.com",
   "akhilcherukuri54@gmail.com",
