@@ -8,6 +8,7 @@ const adminEmails = [
   "pratham153patil@gmail.com",
   "thesamarthjagtap@gmail.com",
   "linkwithsujit@gmail.com",
+  "satya.rallabandi7@gmail.com"
 ];
 
 export default function LoginPage() {
