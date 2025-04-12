@@ -191,7 +191,7 @@ export default function ScannerPage() {
   };
 
   return (
-    <div className="p-4 bg-[#0A0F1F]">
+    <div className="p-4 bg-[#0A1A33]">
       {/* <h1 className="text-2xl font-bold mb-4">QR Code Scanner</h1> */}
 
       {/* Status Messages */}
