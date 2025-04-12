@@ -6,7 +6,8 @@ import Navbar from "@/app/components/Navbar";
 
 const adminEmails = [
   "pratham153patil@gmail.com",
-  "thesamarthjagtap@gmail.com"
+  "thesamarthjagtap@gmail.com",
+  "linkwithsujit@gmail.com",
 ];
 
 export default function DashboardLayout({

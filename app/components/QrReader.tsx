@@ -3,7 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 
-export default function QrReader({ onScan }: { onScan: (data: string) => void }) {
+export default function QrReader({
+  onScan,
+}: {
+  onScan: (data: string) => void;
+}) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -16,22 +20,36 @@ export default function QrReader({ onScan }: { onScan: (data: string) => void })
       setIsLoading(true);
       try {
         const devices = await navigator.mediaDevices.enumerateDevices();
-        const videoDevices = devices.filter(device => device.kind === "videoinput");
+        const videoDevices = devices.filter(
+          (device) => device.kind === "videoinput"
+        );
 
         if (videoDevices.length === 0) {
           throw new Error("No video devices found.");
         }
 
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: videoDevices[0]?.deviceId 
-            ? { facingMode: { exact: "environment" } }
-            : { deviceId: videoDevices[0].deviceId }
-        });
+        // const stream = await navigator.mediaDevices.getUserMedia({
+        //   video: videoDevices[0]?.deviceId
+        //     ? { facingMode: { exact: "environment" } }
+        //     : { deviceId: videoDevices[0].deviceId },
+        // });
         const constraints = {
           video: {
-            facingMode: "environment", // Use rear camera if available
+            facingMode: "environment", 
           },
         };
+
+        let stream;
+        try {
+          // Try rear camera
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { exact: "environment" } },
+          });
+        } catch (err) {
+          console.warn("Rear camera not found, falling back to default:", err);
+          // Fallback to default camera
+          stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        }
 
         await navigator.mediaDevices.getUserMedia(constraints);
         if (videoRef.current) {
@@ -44,7 +62,9 @@ export default function QrReader({ onScan }: { onScan: (data: string) => void })
         html5QrRef.current = new Html5Qrcode("qr-reader-placeholder");
       } catch (err) {
         console.error("Camera error:", err);
-        setError("Unable to access camera. Please check permissions or use file upload.");
+        setError(
+          "Unable to access camera. Please check permissions or use file upload."
+        );
       } finally {
         setIsLoading(false);
       }
@@ -54,7 +74,7 @@ export default function QrReader({ onScan }: { onScan: (data: string) => void })
 
     return () => {
       // Cleanup: Stop the media stream and QR code scanner when the component is unmounted
-      mediaStreamRef.current?.getTracks().forEach(track => track.stop());
+      mediaStreamRef.current?.getTracks().forEach((track) => track.stop());
       html5QrRef.current?.stop().catch(() => {});
     };
   }, []);
@@ -90,7 +110,7 @@ export default function QrReader({ onScan }: { onScan: (data: string) => void })
           setError("QR code scanner is not initialized.");
           return;
         }
-        const result = await html5QrRef.current.scanFile(file, true); 
+        const result = await html5QrRef.current.scanFile(file, true);
         onScan(result);
       } catch (err) {
         console.error("QR scan error:", err);
@@ -109,7 +129,7 @@ export default function QrReader({ onScan }: { onScan: (data: string) => void })
     const file = e.target.files[0];
 
     try {
-      const result = await html5QrRef.current.scanFile(file, true); 
+      const result = await html5QrRef.current.scanFile(file, true);
       onScan(result);
     } catch (err) {
       console.error("QR scan error:", err);
@@ -129,7 +149,7 @@ export default function QrReader({ onScan }: { onScan: (data: string) => void })
         <video
           ref={videoRef}
           className="w-full h-full object-cover"
-          autoPlay 
+          autoPlay
           muted
           playsInline
         />
