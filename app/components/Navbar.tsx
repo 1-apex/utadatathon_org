@@ -15,16 +15,20 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-        <h1 className="text-xl font-bold">Datathon Organizer Portal</h1>
+    <nav className="bg-[#0a0f1f] border-b border-white/10 shadow-md">
+       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+         {/* Logo / Title */}
+         <h1 className="text-xl sm:text-2xl font-mono font-extrabold text-[--orange] tracking-wider drop-shadow-sm">
+           Datathon Admin Portal
+         </h1>
+ 
         <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-600">
+        <span className="text-sm text-[--foreground] font-mono hidden sm:block">
             {auth.currentUser?.email}
           </span>
           <button
             onClick={handleLogout}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors"
+            className="retro-button bg-gradient-to-r from-red-600 to-red-700 border-red-500 hover:from-red-700 hover:to-red-800"
           >
             Logout
           </button>

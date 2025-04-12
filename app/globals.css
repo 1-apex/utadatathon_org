@@ -1,26 +1,76 @@
 @import "tailwindcss";
 
 :root {
-  --background: #000000;
-  --foreground: #171717;
+  --background: hsl(210, 100%, 12%);
+   --foreground: #cad2da;
+   --orange: #ff9f1c;
+   --green: #2ec4b6;
+   --blue: #3a86ff;
 }
 
-:root {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #000000;
+    --font-sans: 'Orbitron', system-ui, sans-serif;
+    --font-mono: 'Courier New', monospace;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+ 
+}
+
+.retro-button {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.retro-button:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 4px 12px var(--blue), 0 0 15px var(--blue);
+}
+
+/* === Glass Card === */
+.glass-card {
+  background-color: var(--glass);
+  border: 1px solid var(--border-glass);
+  border-radius: 1rem;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  padding: 1.5rem;
+}
+
+/* === Status Messages === */
+.status {
+  @apply p-4 mb-4 rounded-md text-sm font-semibold;
+}
+
+.status-error {
+  background-color: rgba(255, 87, 87, 0.1);
+  color: #ff4d4d;
+  border-left: 4px solid #ff4d4d;
+}
+
+.status-success {
+  background-color: rgba(46, 196, 182, 0.1);
+  color: var(--green);
+  border-left: 4px solid var(--green);
+}
+
+.status-loading {
+  background-color: rgba(58, 134, 255, 0.1);
+  color: var(--blue);
+  border-left: 4px solid var(--blue);
+}
+
+.retro-button {
+  @apply inline-flex items-center justify-center px-5 py-2 text-sm font-semibold rounded-md;
+  color: white;
+  border: 1px solid;
+  background-color: #004bc4;
+}
+
+.retro-button:hover {
+  transform: translateY(-1px);
 }

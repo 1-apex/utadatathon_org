@@ -12,7 +12,7 @@ export default function Modal({
   open,
   onClose,
   userData,
-  onRegister,
+  onRegister
 }: {
   open: boolean;
   onClose: () => void;
@@ -20,7 +20,6 @@ export default function Modal({
   onRegister: (eventKey: string) => void;
 }) {
   const [selectedEvent, setSelectedEvent] = useState("event-1");
-
   const events = [
     {
       id: "event-1",
@@ -71,17 +70,11 @@ export default function Modal({
       <div className="bg-white p-6 rounded-lg w-96">
         <h2 className="text-xl font-bold mb-4">Participant Details</h2>
         <div className="space-y-2">
-          <p>
-            <strong>Name:</strong> {userData?.firstname} {userData?.lastname}
-          </p>
-          <p>
-            <strong>Email:</strong> {userData?.email}
-          </p>
-          <p>
-            <strong>School:</strong> {userData?.schoolName}
-          </p>
+          <p><strong>Name:</strong> {userData?.firstname} {userData?.lastname}</p>
+          <p><strong>Email:</strong> {userData?.email}</p>
+          <p><strong>School:</strong> {userData?.schoolName}</p>
         </div>
-
+        
         <div className="mt-4">
           <label className="block mb-2">Select Event</label>
           <select
@@ -89,14 +82,14 @@ export default function Modal({
             value={selectedEvent}
             onChange={(e) => setSelectedEvent(e.target.value)}
           >
-            {events.map((event) => (
+            {events.map(event => (
               <option key={event.id} value={event.id}>
                 {event.name}
               </option>
             ))}
           </select>
         </div>
-
+        
         <div className="mt-4 flex justify-end gap-2">
           <button
             onClick={onClose}

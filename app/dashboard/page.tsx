@@ -191,62 +191,55 @@ export default function ScannerPage() {
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">QR Code Scanner</h1>
+    <div className="p-4 bg-[#0A0F1F]">
+      {/* <h1 className="text-2xl font-bold mb-4">QR Code Scanner</h1> */}
 
       {/* Status Messages */}
-      {error && (
-        <div className="bg-red-100 p-4 rounded mb-4 text-red-700">{error}</div>
-      )}
-      {successMessage && (
-        <div className="bg-green-100 p-4 rounded mb-4 text-green-700">
-          {successMessage}
-        </div>
-      )}
-      {loading && (
-        <div className="p-4 bg-blue-100 rounded mb-4">Processing...</div>
-      )}
-      {registrationLoading && (
-        <div className="p-4 bg-blue-100 rounded mb-4">Registering...</div>
-      )}
+      {error && <div className="status status-error">{error}</div>}
+       {successMessage && <div className="status status-success">{successMessage}</div>}
+       {loading && <div className="status status-loading">Processing...</div>}
+       {registrationLoading && <div className="status status-loading">Registering...</div>}
 
       {/* Scanner Interface */}
-      <div className="border rounded-lg p-4 bg-white shadow-sm">
-        <QrReader onScan={handleScan} />
-      </div>
+      <div className="glass-card">
+         <QrReader onScan={handleScan} />
+       </div>
 
       {/* Control Buttons */}
-      <div className="mt-4 flex gap-2">
-        <button
-          className={`px-4 py-2 rounded ${
-            linkingMode
-              ? "bg-gray-500 cursor-not-allowed"
-              : "bg-blue-500 hover:bg-blue-600 text-white"
-          }`}
-          disabled={linkingMode}
-          onClick={() => {
-            resetLinkingMode();
-            setSuccessMessage("Scanning mode: Event Registration");
-          }}
-        >
-          Scan for Events
-        </button>
-
-        <button
-          className={`px-4 py-2 rounded ${
-            linkingMode
-              ? "bg-purple-600 hover:bg-purple-700 text-white"
-              : "bg-green-500 hover:bg-green-600 text-white"
-          }`}
-          onClick={() => {
-            setLinkingMode(true);
-            setSuccessMessage("Linking mode: Scan random QR first");
-          }}
-        >
-          {linkingMode ? "Linking Mode Active" : "Link New QR"}
-        </button>
-      </div>
-
+      <div className="mt-6 flex flex-wrap justify-center gap-4">
+       <button
+   className={`retro-button ${linkingMode ? "opacity-50 cursor-not-allowed" : ""}`}
+   disabled={linkingMode}
+   onClick={() => {
+     resetLinkingMode();
+     setSuccessMessage("Scanning mode: Event Registration");
+   }}
+ >
+   Scan for Events
+ </button>
+ 
+ <button
+   className="retro-button"
+   onClick={() => {
+     setLinkingMode(true);
+     setSuccessMessage("Linking mode: Scan random QR first");
+   }}
+ >
+   Link QR
+ </button>
+ 
+ <Modal
+   open={showModal}
+   onClose={() => setShowModal(false)}
+   userData={scannedData || {
+     firstname: "",
+     lastname: "",
+     email: "",
+     schoolName: "",
+   }}
+   onRegister={handleEventRegistration}
+ />
+       </div>
       {/* Registration Modal */}
       <Modal
         open={showModal}

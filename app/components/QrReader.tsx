@@ -125,33 +125,32 @@ export default function QrReader({
 
   return (
     <div className="w-full max-w-md mx-auto p-4">
-      <div className="relative aspect-square rounded-lg overflow-hidden bg-black shadow-md">
-        {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center text-white text-lg font-semibold bg-black/70">
-            Loading camera...
-          </div>
-        )}
-
-        <video
-          ref={videoRef}
-          className="w-full h-full object-cover"
-          autoPlay
-          muted
-          playsInline
-        />
-      </div>
+      <div className="relative aspect-square rounded-lg overflow-hidden bg-[black] shadow-md">
+         {isLoading && (
+           <div className="absolute inset-0 flex items-center justify-center text-white text-lg font-semibold bg-black/70">
+             Loading camera...
+           </div>
+         )}
+         <video
+           ref={videoRef}
+           className="w-full h-full object-cover"
+           autoPlay
+           muted
+           playsInline
+         />
+       </div>
 
       <canvas ref={canvasRef} className="hidden" />
 
       <div className="mt-4 flex flex-col sm:flex-row justify-center items-center gap-3">
         <button
           onClick={captureAndScan}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
+          className="px-4 py-2 bg-green-600 text-white font-semibold font-mono rounded-md shadow hover:bg-green-700 transition text-center"
         >
           Capture & Scan
         </button>
 
-        <label className="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-lg cursor-pointer transition">
+        <label className="cursor-pointer bg-gray-600 text-white font-semibold font-mono px-4 py-2 rounded-md shadow hover:bg-gray-700 transition text-center">
           Upload QR
           <input
             type="file"
