@@ -13,61 +13,52 @@ export default function QrReader({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[]>([]);
-  const [currentDeviceId, setCurrentDeviceId] = useState<string | null>(null);
+  const [facingMode, setFacingMode] = useState<"environment" | "user">(
+    "environment"
+  );
   const html5QrRef = useRef<Html5Qrcode | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
 
   const toggleCamera = async () => {
-    if (!html5QrRef.current) return;
-  
+    if (!html5QrRef.current || !mediaStreamRef.current) return;
+
     setIsLoading(true);
     setError(null);
-  
+
     try {
+      // Stop current stream and scanner
+      mediaStreamRef.current.getTracks().forEach((track) => track.stop());
       await html5QrRef.current.stop();
-      mediaStreamRef.current?.getTracks().forEach((track) => track.stop());
-  
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  
-      if (isIOS) {
-        // iOS can't enumerate device IDs properly — use facingMode flip
-        const newFacingMode =
-          currentDeviceId === "environment" ? "user" : "environment";
-  
-        html5QrRef.current = new Html5Qrcode("qr-reader-placeholder");
-        await html5QrRef.current.start(
-          { facingMode: newFacingMode },
-          { fps: 10, qrbox: 250 },
-          onScan,
-          (err) => console.error("QR scan error", err)
-        );
-  
-        setCurrentDeviceId(newFacingMode);
-      } else {
-        // Android / Desktop – toggle by device ID
-        const currentIndex = videoDevices.findIndex(
-          (device) => device.deviceId === currentDeviceId
-        );
-        const nextIndex = (currentIndex + 1) % videoDevices.length;
-        const nextDeviceId = videoDevices[nextIndex].deviceId;
-  
-        html5QrRef.current = new Html5Qrcode("qr-reader-placeholder");
-        await html5QrRef.current.start(
-          { deviceId: { exact: nextDeviceId } },
-          { fps: 10, qrbox: 250 },
-          onScan,
-          (err) => console.error("QR scan error", err)
-        );
-  
-        setCurrentDeviceId(nextDeviceId);
+
+      // Switch facing mode
+      const newFacingMode =
+        facingMode === "environment" ? "user" : "environment";
+      const constraints = { video: { facingMode: { exact: newFacingMode } } };
+
+      // Get new media stream
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      mediaStreamRef.current = stream;
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
       }
+
+      // Update state and restart scanner
+      setFacingMode(newFacingMode);
+      await html5QrRef.current.start(
+        { facingMode: newFacingMode },
+        { fps: 10, qrbox: 250 },
+        onScan,
+        (error) => console.error("QR scan error:", error)
+      );
     } catch (err) {
-      console.error("Camera toggle failed", err);
-      setError("Unable to switch camera.");
+      console.error("Camera switch failed:", err);
+      setError("Camera switch unavailable. Using current camera.");
     } finally {
       setIsLoading(false);
     }
-  };  
+  };
 
   useEffect(() => {
     const initCamera = async () => {
@@ -81,30 +72,27 @@ export default function QrReader({
           throw new Error("No video devices found.");
         }
 
-        let selectedDeviceId = videoInputs[0].deviceId;
-        for (const device of videoInputs) {
-          if (device.label.toLowerCase().includes("back")) {
-            selectedDeviceId = device.deviceId;
-            break;
-          }
+        let stream;
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { exact: "environment" } },
+          });
+        } catch (err) {
+          console.warn("Rear camera not found, falling back to default:", err);
+          stream = await navigator.mediaDevices.getUserMedia({ video: true });
         }
 
-        setCurrentDeviceId(selectedDeviceId);
-
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { deviceId: { exact: selectedDeviceId } },
-        });
-
-        mediaStreamRef.current = stream;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           await videoRef.current.play();
         }
 
+        mediaStreamRef.current = stream;
         html5QrRef.current = new Html5Qrcode("qr-reader-placeholder");
 
+        // Start QR scanning
         await html5QrRef.current.start(
-          { deviceId: { exact: selectedDeviceId } },
+          videoRef.current!,
           { fps: 10, qrbox: 250 },
           onScan,
           (error) => console.error("QR scan error:", error)
@@ -166,7 +154,7 @@ export default function QrReader({
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setError(null);
     if (!e.target.files?.length || !html5QrRef.current) {
-      setError("No file selected or QR code scanner not initialized.");
+      setError("No file selected or QR code scanner is not initialized.");
       return;
     }
 
@@ -177,44 +165,52 @@ export default function QrReader({
       onScan(result);
     } catch (err) {
       console.error("QR scan error:", err);
-      setError("No QR code found in uploaded file.");
+      setError("No QR code found in the uploaded file. Please try another.");
     }
   };
 
   return (
-    <div className="flex flex-col gap-4 items-center justify-center p-4">
-      <div id="qr-reader-placeholder" className="hidden" />
+    <div className="w-full max-w-md mx-auto p-4">
+      <div className="relative aspect-square rounded-lg overflow-hidden bg-black shadow-md">
+        {isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center text-white text-lg font-semibold bg-black/70">
+            Loading camera...
+          </div>
+        )}
 
-      <video
-        ref={videoRef}
-        className="rounded shadow-md max-w-full w-[360px] h-[270px] bg-black"
-        autoPlay
-        muted
-        playsInline
-      />
+        {/* {videoDevices.length > 1 && (
+          <button
+            onClick={toggleCamera}
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10
+              bg-black/70 hover:bg-black/80 text-white px-4 py-2 
+              rounded-full text-sm transition-all"
+            disabled={isLoading}
+          >
+            {isLoading ? "Switching..." : "↻ Flip Camera"}
+          </button>
+        )} */}
+
+        <video
+          ref={videoRef}
+          className="w-full h-full object-cover"
+          autoPlay
+          muted
+          playsInline
+        />
+      </div>
 
       <canvas ref={canvasRef} className="hidden" />
 
-      {error && <p className="text-red-500">{error}</p>}
-      {isLoading && <p className="text-gray-500">Initializing camera...</p>}
-
-      <div className="flex gap-2 mt-2">
-        {videoDevices.length > 1 && (
-          <button
-            onClick={toggleCamera}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 transition"
-          >
-            Switch Camera
-          </button>
-        )}
+      <div className="mt-4 flex flex-col sm:flex-row justify-center items-center gap-3">
         <button
           onClick={captureAndScan}
-          className="px-4 py-2 bg-green-600 text-white rounded-md shadow hover:bg-green-700 transition"
+          className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
         >
-          Scan Frame
+          Capture & Scan
         </button>
-        <label className="cursor-pointer bg-gray-600 text-white px-4 py-2 rounded-md shadow hover:bg-gray-700 transition">
-          Upload Image
+
+        <label className="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-lg cursor-pointer transition">
+          Upload QR
           <input
             type="file"
             accept="image/*"
@@ -223,6 +219,12 @@ export default function QrReader({
           />
         </label>
       </div>
+
+      {error && (
+        <div className="mt-3 text-sm text-red-500 text-center">{error}</div>
+      )}
+
+      <div id="qr-reader-placeholder" className="hidden" />
     </div>
   );
 }
