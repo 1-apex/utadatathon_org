@@ -116,13 +116,28 @@ export default function ScannerPage() {
         // Normal scan operation
         const qrRef = doc(db, "qr-links", id.trim());
         const qrSnap = await getDoc(qrRef);
+        let userDocId: string;
+        let userRef;
 
-        if (!qrSnap.exists()) {
-          throw new Error("QR code not registered.");
+        if (qrSnap.exists()) {
+          userDocId = qrSnap.data().userDocId;
+          userRef = doc(db, "registrations", userDocId);
+        }
+        else{
+          throw new Error("Scan the gameboy QR!! If not contact DEV team!");
         }
 
-        const userDocId = qrSnap.data().userDocId;
-        const userRef = doc(db, "registrations", userDocId);
+        // ----------------------------------------------------------------------------------------------------
+        // remove this comment if you want to use direct scanning user QR codes for event registration
+        // if (qrSnap.exists()) {
+        //   userDocId = qrSnap.data().userDocId;
+        //   userRef = doc(db, "registrations", userDocId);
+        // } else {
+        //   userDocId = id.trim();
+        //   userRef = doc(db, "registrations", userDocId);
+        // }
+        // ----------------------------------------------------------------------------------------------------
+
         const userSnap = await getDoc(userRef);
 
         if (!userSnap.exists()) {
