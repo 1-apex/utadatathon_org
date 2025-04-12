@@ -15,7 +15,6 @@ export default function QrReader({
   const html5QrRef = useRef<Html5Qrcode | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
 
-
   useEffect(() => {
     const initCamera = async () => {
       setIsLoading(true);
@@ -30,7 +29,7 @@ export default function QrReader({
         let stream;
         try {
           stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: { exact: "environment" } },
+            video: { facingMode: { ideal: "environment" } },
           });
         } catch (err) {
           console.warn("Rear camera not found, falling back to default:", err);
@@ -46,8 +45,8 @@ export default function QrReader({
         html5QrRef.current = new Html5Qrcode("qr-reader-placeholder");
 
         // Start QR scanning
-        await html5QrRef.current.start(
-          videoRef.current!,
+        html5QrRef.current.start(
+          "qr-reader-placeholder",
           { fps: 10, qrbox: 250 },
           onScan,
           (error) => console.error("QR scan error:", error)
